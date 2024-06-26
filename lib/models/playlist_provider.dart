@@ -31,7 +31,7 @@ class PlaylistProvider extends ChangeNotifier {
   ];
 
   // current song playing index
-  int? _currentSongIndex;
+  int? _currentSongIndex = 0;
 
   /* AUDIO PLAYERS */
   // audio player
@@ -76,6 +76,8 @@ class PlaylistProvider extends ChangeNotifier {
   void pauseOrResume() async {
     if (_isPlaying) {
       pause();
+    } else if (!_isPlaying & (_currentSongIndex == 0)) {
+      play();
     } else {
       resume();
     }
