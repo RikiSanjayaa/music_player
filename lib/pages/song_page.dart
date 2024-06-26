@@ -32,7 +32,7 @@ class _SongPageState extends State<SongPage> {
 
         // return scaffold UI
         return Scaffold(
-          backgroundColor: Theme.of(context).colorScheme.background,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           body: SafeArea(
             child: Padding(
               padding: const EdgeInsets.only(left: 25, right: 25, bottom: 25),
@@ -98,7 +98,7 @@ class _SongPageState extends State<SongPage> {
                           child: Icon(Icons.shuffle,
                               color: value.isShuffle
                                   ? Colors.red
-                                  : Theme.of(context).colorScheme.onBackground),
+                                  : Theme.of(context).colorScheme.onSurface),
                         ),
 
                         // repeat icon
@@ -112,7 +112,7 @@ class _SongPageState extends State<SongPage> {
                             Icons.repeat,
                             color: value.isRepeat
                                 ? Colors.red
-                                : Theme.of(context).colorScheme.onBackground,
+                                : Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
 

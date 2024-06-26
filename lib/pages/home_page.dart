@@ -70,10 +70,10 @@ class _HomePageState extends State<HomePage> {
         ],
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        selectedItemColor: Theme.of(context).colorScheme.onBackground,
+        selectedItemColor: Theme.of(context).colorScheme.onSurface,
         unselectedItemColor: Theme.of(context).colorScheme.primary,
       ),
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(title: const Text("My Music Player")),
       drawer: const MyDrawer(),
       body: PageView(
