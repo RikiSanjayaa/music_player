@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:music_player/models/playlist_provider.dart';
 
 import 'package:music_player/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'pages/home_page.dart';
 
 void main() {
-  runApp(ChangeNotifierProvider(
-    create: (context) => ThemeProvider(),
-    child: const MainApp(),
-  ));
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => ThemeProvider()),
+        ChangeNotifierProvider(
+          create: (context) => PlaylistProvider(),
+        ),
+      ],
+      child: const MainApp(),
+    ),
+  );
 }
 
 class MainApp extends StatelessWidget {
