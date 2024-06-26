@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:music_player/models/song.dart';
@@ -48,6 +50,8 @@ class PlaylistProvider extends ChangeNotifier {
 
   // initially not playing
   bool _isPlaying = false;
+  bool _repeat = false;
+  bool _shuffle = false;
 
   // play the song
   void play() async {
@@ -91,12 +95,22 @@ class PlaylistProvider extends ChangeNotifier {
 
   // play next song
   void playNextSong() {
-    if (_currentSongIndex != null) {
+    if (_repeat) {
+      seek(Duration.zero);
+      _repeat = false;
+      play();
+    } else if (_shuffle) {
+      int nextIndex;
+      do {
+        nextIndex = Random().nextInt(_playlist.length);
+      } while (_playlist.length > 1 && nextIndex == _currentSongIndex);
+      currentSongIndex = nextIndex;
+    } else if (_currentSongIndex != null) {
       if (_currentSongIndex! < _playlist.length - 1) {
         // go to the next song if it's not the last song
         currentSongIndex = _currentSongIndex! + 1;
       } else {
-        // if it's the las song, loop back to first song
+        // if it's the last song, loop back to first song
         currentSongIndex = 0;
       }
     }
@@ -117,6 +131,17 @@ class PlaylistProvider extends ChangeNotifier {
         currentSongIndex = _playlist.length - 1;
       }
     }
+  }
+
+  // repeat current song
+  void repeatCurrentSong() async {
+    _repeat = !_repeat;
+    notifyListeners();
+  }
+
+  void shuffleSong() async {
+    _shuffle = !_shuffle;
+    notifyListeners();
   }
 
   // listen to duration
@@ -145,6 +170,8 @@ class PlaylistProvider extends ChangeNotifier {
   List<Song> get playlist => _playlist;
   int? get currentSongIndex => _currentSongIndex;
   bool get isPlaying => _isPlaying;
+  bool get isRepeat => _repeat;
+  bool get isShuffle => _shuffle;
   Duration get currentDuration => _currentDuration;
   Duration get totalDuation => _totalDuration;
 

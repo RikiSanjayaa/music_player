@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:music_player/components/neu_box.dart';
 import 'package:music_player/models/playlist_provider.dart';
 import 'package:provider/provider.dart';
 
-class SongPage extends StatelessWidget {
+class SongPage extends StatefulWidget {
   const SongPage({super.key});
 
+  @override
+  State<SongPage> createState() => _SongPageState();
+}
+
+class _SongPageState extends State<SongPage> {
   // convert duration into min:sec
   String formatTime(Duration duration) {
     String twoDigitSeconds =
@@ -84,10 +90,32 @@ class SongPage extends StatelessWidget {
                         Text(formatTime(value.currentDuration)),
 
                         // shuffle icon
-                        const Icon(Icons.shuffle),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              value.shuffleSong();
+                            });
+                          },
+                          child: Icon(Icons.shuffle,
+                              color: value.isShuffle
+                                  ? Colors.red
+                                  : Theme.of(context).colorScheme.onBackground),
+                        ),
 
                         // repeat icon
-                        const Icon(Icons.repeat),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              value.repeatCurrentSong();
+                            });
+                          },
+                          child: Icon(
+                            Icons.repeat,
+                            color: value.isRepeat
+                                ? Colors.red
+                                : Theme.of(context).colorScheme.onBackground,
+                          ),
+                        ),
 
                         // end time
                         Text(formatTime(value.totalDuation)),
