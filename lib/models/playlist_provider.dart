@@ -80,7 +80,7 @@ class PlaylistProvider extends ChangeNotifier {
   void pauseOrResume() async {
     if (_isPlaying) {
       pause();
-    } else if (!_isPlaying & (_currentSongIndex == 0)) {
+    } else if (!_isPlaying && (_currentSongIndex == 0)) {
       play();
     } else {
       resume();
@@ -163,8 +163,6 @@ class PlaylistProvider extends ChangeNotifier {
       playNextSong();
     });
   }
-
-  // dispose audio player
 
   /* GETTERS */
   List<Song> get playlist => _playlist;
