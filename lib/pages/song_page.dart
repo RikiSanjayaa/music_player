@@ -34,26 +34,6 @@ class SongPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // app bar
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // back button
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.arrow_back),
-                      ),
-
-                      // title
-                      const Text("P L A Y L I S T"),
-
-                      // menu button
-                      IconButton(onPressed: () {}, icon: const Icon(Icons.menu))
-                    ],
-                  ),
-
-                  const SizedBox(height: 25),
-
                   // album artwork
                   NeuBox(
                     child: Column(
