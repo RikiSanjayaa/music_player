@@ -46,6 +46,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Theme.of(context).colorScheme.secondary,
         items: const [
           BottomNavigationBarItem(
               icon: Icon(Icons.playlist_play_rounded), label: 'Playlist'),
@@ -59,6 +60,7 @@ class _HomePageState extends State<HomePage> {
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: const Text("My Music Player"),
         actions: [
           IconButton(
