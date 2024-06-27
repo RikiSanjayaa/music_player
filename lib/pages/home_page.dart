@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:music_player/components/my_drawer.dart';
-import 'package:music_player/models/playlist_provider.dart';
-import 'package:music_player/models/song.dart';
+import 'package:music_player/pages/playlist_page.dart';
 import 'package:music_player/pages/song_page.dart';
-import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,16 +14,9 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
 
-  // get the playlist provider
-  late final dynamic playlistProvider;
-
   @override
   void initState() {
     super.initState();
-
-    // get playlist provider
-    playlistProvider = Provider.of<PlaylistProvider>(context, listen: false);
-
     // add listener to page controller
     _pageController.addListener(() {
       int nextPage = _pageController.page!.round();
@@ -43,13 +34,6 @@ class _HomePageState extends State<HomePage> {
     });
     _pageController.animateToPage(index,
         duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-  }
-
-  // play song
-  void playSong(int songIndex) {
-    // update current song index
-    playlistProvider.currentSongIndex = songIndex;
-    _onItemTapped(1);
   }
 
   @override
@@ -78,36 +62,12 @@ class _HomePageState extends State<HomePage> {
       drawer: const MyDrawer(),
       body: PageView(
         controller: _pageController,
-        children: [
-          // original home page
-          Consumer<PlaylistProvider>(
-            builder: (context, value, child) {
-              // get the playlist
-              final List<Song> playlist = value.playlist;
+        children: const [
+          // playlist page
+          PlaylistPage(),
 
-              // return list view UI
-              return ListView.builder(
-                itemCount: playlist.length,
-                itemBuilder: (context, index) {
-                  // get individual song
-                  final Song song = playlist[index];
-
-                  // return list tile UI
-                  return ListTile(
-                    title: Text(song.songName),
-                    subtitle: Text(song.artistName),
-                    leading: Image.asset(song.albumArtImagePath),
-                    onTap: () {
-                      playSong(index);
-                    },
-                  );
-                },
-              );
-            },
-          ),
-
-          // second page
-          const SongPage()
+          // now playing page
+          SongPage()
         ],
       ),
     );
