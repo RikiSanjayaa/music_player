@@ -58,7 +58,16 @@ class _HomePageState extends State<HomePage> {
         unselectedItemColor: Theme.of(context).colorScheme.primary,
       ),
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(title: const Text("My Music Player")),
+      appBar: AppBar(
+        title: const Text("My Music Player"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            // TODO: implement add new song to playlist
+            onPressed: () {},
+          )
+        ],
+      ),
       drawer: const MyDrawer(),
       body: PageView(
         controller: _pageController,
