@@ -126,12 +126,13 @@ class _SongPageState extends State<SongPage> {
                   SliderTheme(
                     data: SliderTheme.of(context).copyWith(
                         thumbShape:
-                            const RoundSliderThumbShape(enabledThumbRadius: 0)),
+                            const RoundSliderThumbShape(enabledThumbRadius: 5)),
                     child: Slider(
                       min: 0,
                       max: value.totalDuation.inSeconds.toDouble(),
                       value: value.currentDuration.inSeconds.toDouble(),
                       activeColor: Colors.green,
+                      inactiveColor: Theme.of(context).colorScheme.secondary,
                       onChanged: (double double) {
                         // during when the use is sliding around
                       },
