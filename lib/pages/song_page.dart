@@ -46,7 +46,7 @@ class _SongPageState extends State<SongPage> {
                         // image
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
-                          child: Image.asset(currentSong.albumArtImagePath),
+                          child: Image.network(currentSong.albumArtImagePath),
                         ),
 
                         // song and artist name and icon

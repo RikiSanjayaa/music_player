@@ -1,39 +1,23 @@
 import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
+// import 'package:flutter/material.dart';
 import 'package:music_player/models/song.dart';
 
 class PlaylistProvider extends ChangeNotifier {
+  final songs = FirebaseFirestore.instance.collection('songs');
+  final storageRef = FirebaseStorage.instance.ref();
+
   // playlist of songs
-  final List<Song> _playlist = [
-    // song 1
-    Song(
-      songName: "Drunk Text",
-      artistName: "Henry Moodie",
-      albumArtImagePath: "assets/images/drunk-text.jpg",
-      audioPath: "audio/drunk-text.mp3",
-    ),
-
-    // song 2
-    Song(
-      songName: "Levitating",
-      artistName: "Dua Lipa",
-      albumArtImagePath: "assets/images/levitating.jpg",
-      audioPath: "audio/levitating.mp3",
-    ),
-
-    // song 3
-    Song(
-      songName: "Firefly",
-      artistName: "Owl City",
-      albumArtImagePath: "assets/images/firefly.jpeg",
-      audioPath: "audio/firefly.mp3",
-    ),
+  List<Song> _playlist = [
+    // remove assets songs and store them into firebase firestore
   ];
 
   // current song playing index
-  int? _currentSongIndex = 0;
+  int? _currentSongIndex;
 
   /* AUDIO PLAYERS */
   // audio player
@@ -45,7 +29,27 @@ class PlaylistProvider extends ChangeNotifier {
 
   // constructor
   PlaylistProvider() {
+    fetchSongsFromFirestore();
     listenToDuration();
+  }
+
+  // fetching songs from firestore
+  Future<void> fetchSongsFromFirestore() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('songs').get();
+      _playlist =
+          querySnapshot.docs.map((doc) => Song.fromFirestore(doc)).toList();
+      if (_playlist.isNotEmpty) {
+        _currentSongIndex =
+            0; // Set to the first song if the playlist is not empty
+      }
+      notifyListeners(); // Notify listeners to update UI
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching songs: $e');
+      }
+    }
   }
 
   // initially not playing
@@ -57,7 +61,7 @@ class PlaylistProvider extends ChangeNotifier {
   void play() async {
     final String path = _playlist[_currentSongIndex!].audioPath;
     await _audioPlayer.stop();
-    await _audioPlayer.play(AssetSource(path));
+    await _audioPlayer.play(UrlSource(path));
     _isPlaying = true;
     notifyListeners();
   }

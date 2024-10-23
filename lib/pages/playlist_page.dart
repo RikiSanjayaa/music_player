@@ -33,6 +33,11 @@ class _PlaylistPageState extends State<PlaylistPage> {
   Widget build(BuildContext context) {
     return Consumer<PlaylistProvider>(
       builder: (context, value, child) {
+        // default page if no song is available
+        if (value.playlist.isEmpty || value.currentSongIndex == null) {
+          return const Center(child: Text('No songs available'));
+        }
+
         // get the playlist
         final List<Song> playlist = value.playlist;
         final int? currentSongIndex = value.currentSongIndex;
@@ -50,7 +55,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: Image.asset(
+                      child: Image.network(
                         playlist[currentSongIndex!].albumArtImagePath,
                         width: 100,
                       ),
@@ -109,7 +114,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                         key: ValueKey("${song.songName}-${song.artistName}"),
                         title: Text(song.songName),
                         subtitle: Text(song.artistName),
-                        leading: Image.asset(song.albumArtImagePath),
+                        leading: Image.network(song.albumArtImagePath),
                         trailing: isCurrentSong && value.isPlaying
                             ? const Icon(Icons.pause)
                             : const Icon(Icons.play_arrow),
@@ -131,7 +136,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                           key: ValueKey("${song.songName}-${song.artistName}"),
                           title: Text(song.songName),
                           subtitle: Text(song.artistName),
-                          leading: Image.asset(song.albumArtImagePath),
+                          leading: Image.network(song.albumArtImagePath),
                           trailing: isCurrentSong && value.isPlaying
                               ? const Icon(Icons.pause)
                               : const Icon(Icons.play_arrow),
