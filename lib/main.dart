@@ -1,11 +1,16 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:music_player/firebase_options.dart';
 import 'package:music_player/models/playlist_provider.dart';
 
 import 'package:music_player/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'pages/home_page.dart';
 
-void main() {
+void main() async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(
     MultiProvider(
       providers: [
