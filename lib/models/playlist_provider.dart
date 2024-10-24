@@ -168,6 +168,35 @@ class PlaylistProvider extends ChangeNotifier {
     });
   }
 
+  // update song
+  void updateSong(int index, String songName, String artistName,
+      String albumArtImagePath) async {
+    String songId = _playlist[index].id;
+    // Update the song in Firestore
+    try {
+      await FirebaseFirestore.instance
+          .collection('songs')
+          .doc(_playlist[index].id) // Assuming each song has a unique ID
+          .update({
+        'songName': songName,
+        'artistName': artistName,
+        'albumArtImagePath': albumArtImagePath,
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error updating song in Firestore: $e');
+      }
+    }
+    _playlist[index] = Song(
+      id: songId,
+      songName: songName,
+      artistName: artistName,
+      albumArtImagePath: albumArtImagePath,
+      audioPath: _playlist[index].audioPath,
+    );
+    notifyListeners();
+  }
+
   /* GETTERS */
   List<Song> get playlist => _playlist;
   int? get currentSongIndex => _currentSongIndex;
