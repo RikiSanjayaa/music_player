@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -57,6 +58,7 @@ class PlaylistProvider extends ChangeNotifier {
   bool _isPlaying = false;
   bool _repeat = false;
   bool _shuffle = false;
+  bool _isLoading = false;
 
   // play the song
   void play() async {
@@ -169,6 +171,63 @@ class PlaylistProvider extends ChangeNotifier {
     });
   }
 
+  // add song
+  Future<void> addSong(String songName, File audioFile,
+      [String artistName = "-", File? albumImage]) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      // Upload audio file to Firebase Storage
+      String audioFileName = audioFile.path.split('/').last;
+      Reference audioRef =
+          FirebaseStorage.instance.ref().child('mp3_file/$audioFileName');
+      UploadTask audioUploadTask = audioRef.putFile(audioFile);
+      TaskSnapshot audioSnapshot = await audioUploadTask;
+      String audioUrl = await audioSnapshot.ref.getDownloadURL();
+
+      // Upload album image to Firebase Storage (if provided)
+      String albumImageUrl = '';
+      if (albumImage != null) {
+        String albumImageName = albumImage.path.split('/').last;
+        Reference albumImageRef =
+            FirebaseStorage.instance.ref().child('img_file/$albumImageName');
+        UploadTask albumImageUploadTask = albumImageRef.putFile(albumImage);
+        TaskSnapshot albumImageSnapshot = await albumImageUploadTask;
+        albumImageUrl = await albumImageSnapshot.ref.getDownloadURL();
+      } else {
+        albumImageUrl = "";
+      }
+
+      // Add song to Firestore
+      DocumentReference docRef =
+          await FirebaseFirestore.instance.collection('songs').add({
+        'songName': songName,
+        'artistName': artistName,
+        'audioUrl': audioUrl,
+        'albumArtImagePath': albumImageUrl,
+      });
+
+      // Add song to local playlist
+      Song newSong = Song(
+        id: docRef.id,
+        songName: songName,
+        artistName: artistName,
+        albumArtImagePath: albumImageUrl,
+        audioPath: audioUrl,
+      );
+      _playlist.add(newSong);
+      notifyListeners();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error adding song: $e');
+      }
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   // update song
   void updateSong(int index, String songName, String artistName,
       String albumArtImagePath) async {
@@ -196,21 +255,31 @@ class PlaylistProvider extends ChangeNotifier {
   }
 
   // delete song
-  void deleteSong(int index) async {
+  Future<void> deleteSong(int index) async {
+    if (index < 0 || index >= _playlist.length) {
+      if (kDebugMode) {
+        print('Invalid index');
+      }
+      return;
+    }
+
     String songId = _playlist[index].id;
     try {
       // delete the song from Firestore
       await FirebaseFirestore.instance.collection('songs').doc(songId).delete();
       // delete the media (mp3 and image) from Storage
       storage.refFromURL(_playlist[index].audioPath).delete();
-      storage.refFromURL(_playlist[index].albumArtImagePath).delete();
+      if (_playlist[index].albumArtImagePath.length >= 4) {
+        storage.refFromURL(_playlist[index].albumArtImagePath).delete();
+      }
+      // remove song from local playlist
+      _playlist.removeAt(index);
+      notifyListeners();
     } catch (e) {
       if (kDebugMode) {
         print('Error deleting song in Firestore: $e');
       }
     }
-    _playlist.remove(_playlist[index]);
-    notifyListeners();
   }
 
   /* GETTERS */
@@ -219,6 +288,7 @@ class PlaylistProvider extends ChangeNotifier {
   bool get isPlaying => _isPlaying;
   bool get isRepeat => _repeat;
   bool get isShuffle => _shuffle;
+  bool get isLoading => _isLoading;
   Duration get currentDuration => _currentDuration;
   Duration get totalDuation => _totalDuration;
 
