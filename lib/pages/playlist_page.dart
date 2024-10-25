@@ -15,6 +15,8 @@ class PlaylistPage extends StatefulWidget {
 class _PlaylistPageState extends State<PlaylistPage> {
   // get the playlist provider
   late final dynamic playlistProvider;
+  final defaultAlbumCover =
+      'https://firebasestorage.googleapis.com/v0/b/music-player-app-cc4d1.appspot.com/o/img_file%2Fdefault_album_image.jpg?alt=media&token=285e235a-618d-4067-baa2-ac19b17dfb4f';
 
   @override
   void initState() {
@@ -71,9 +73,12 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                   labelText: "Artist Name"),
                             ),
                             const SizedBox(height: 20),
-                            albumArtImagePath.isNotEmpty
+                            albumArtImagePath != ""
                                 ? Image.network(albumArtImagePath, height: 300)
-                                : Container(),
+                                : Image.network(
+                                    defaultAlbumCover,
+                                    height: 300,
+                                  ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: <Widget>[
@@ -81,8 +86,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                   onPressed: () {
                                     // Remove album image
                                     setState(() {
-                                      albumArtImagePath =
-                                          'https://firebasestorage.googleapis.com/v0/b/music-player-app-cc4d1.appspot.com/o/img_file%2Fdefault_album_image.jpg?alt=media&token=285e235a-618d-4067-baa2-ac19b17dfb4f';
+                                      albumArtImagePath = defaultAlbumCover;
                                     });
                                   },
                                   child: Text(
@@ -156,10 +160,15 @@ class _PlaylistPageState extends State<PlaylistPage> {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: Image.network(
-                        playlist[currentSongIndex!].albumArtImagePath,
-                        width: 100,
-                      ),
+                      child: playlist[currentSongIndex!].albumArtImagePath != ""
+                          ? Image.network(
+                              playlist[currentSongIndex].albumArtImagePath,
+                              width: 100,
+                            )
+                          : Image.network(
+                              defaultAlbumCover,
+                              width: 100,
+                            ),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 25),
@@ -215,7 +224,9 @@ class _PlaylistPageState extends State<PlaylistPage> {
                         key: ValueKey("${song.songName}-${song.artistName}"),
                         title: Text(song.songName),
                         subtitle: Text(song.artistName),
-                        leading: Image.network(song.albumArtImagePath),
+                        leading: song.albumArtImagePath != ""
+                            ? Image.network(song.albumArtImagePath)
+                            : Image.network(defaultAlbumCover),
                         trailing: isCurrentSong && value.isPlaying
                             ? const Icon(Icons.pause)
                             : const Icon(Icons.play_arrow),
@@ -264,7 +275,10 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                 TextButton(
                                   onPressed: () =>
                                       Navigator.of(context).pop(true),
-                                  child: const Text("Delete"),
+                                  child: Text(
+                                    "Delete",
+                                    style: TextStyle(color: Colors.red[400]),
+                                  ),
                                 ),
                               ],
                             );
@@ -280,7 +294,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                     onDismissed: (direction) {
                       if (direction == DismissDirection.startToEnd) {
                         // Handle delete action
-                        // value.deleteSong(index);
+                        value.deleteSong(index);
                       }
                     },
                     child: isCurrentSong
@@ -290,7 +304,9 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                 ValueKey("${song.songName}-${song.artistName}"),
                             title: Text(song.songName),
                             subtitle: Text(song.artistName),
-                            leading: Image.network(song.albumArtImagePath),
+                            leading: song.albumArtImagePath != ""
+                                ? Image.network(song.albumArtImagePath)
+                                : Image.network(defaultAlbumCover),
                             trailing: isCurrentSong && value.isPlaying
                                 ? const Icon(Icons.pause)
                                 : const Icon(Icons.play_arrow),

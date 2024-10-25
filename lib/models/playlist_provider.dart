@@ -9,6 +9,7 @@ import 'package:music_player/models/song.dart';
 
 class PlaylistProvider extends ChangeNotifier {
   final songs = FirebaseFirestore.instance.collection('songs');
+  final storage = FirebaseStorage.instance;
   final storageRef = FirebaseStorage.instance.ref();
 
   // playlist of songs
@@ -174,10 +175,7 @@ class PlaylistProvider extends ChangeNotifier {
     String songId = _playlist[index].id;
     // Update the song in Firestore
     try {
-      await FirebaseFirestore.instance
-          .collection('songs')
-          .doc(_playlist[index].id) // Assuming each song has a unique ID
-          .update({
+      await FirebaseFirestore.instance.collection('songs').doc(songId).update({
         'songName': songName,
         'artistName': artistName,
         'albumArtImagePath': albumArtImagePath,
@@ -194,6 +192,24 @@ class PlaylistProvider extends ChangeNotifier {
       albumArtImagePath: albumArtImagePath,
       audioPath: _playlist[index].audioPath,
     );
+    notifyListeners();
+  }
+
+  // delete song
+  void deleteSong(int index) async {
+    String songId = _playlist[index].id;
+    try {
+      // delete the song from Firestore
+      await FirebaseFirestore.instance.collection('songs').doc(songId).delete();
+      // delete the media (mp3 and image) from Storage
+      storage.refFromURL(_playlist[index].audioPath).delete();
+      storage.refFromURL(_playlist[index].albumArtImagePath).delete();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error deleting song in Firestore: $e');
+      }
+    }
+    _playlist.remove(_playlist[index]);
     notifyListeners();
   }
 
