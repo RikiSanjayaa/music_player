@@ -22,6 +22,9 @@ class _SongPageState extends State<SongPage> {
 
   @override
   Widget build(BuildContext context) {
+    String defaultAlbumCover =
+        'https://firebasestorage.googleapis.com/v0/b/music-player-app-cc4d1.appspot.com/o/img_file%2Fdefault_album_image.jpg?alt=media&token=285e235a-618d-4067-baa2-ac19b17dfb4f';
+
     return Consumer<PlaylistProvider>(
       builder: (context, value, child) {
         // get playlist
@@ -46,7 +49,9 @@ class _SongPageState extends State<SongPage> {
                         // image
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
-                          child: Image.network(currentSong.albumArtImagePath),
+                          child: currentSong.albumArtImagePath != ""
+                              ? Image.network(currentSong.albumArtImagePath)
+                              : Image.network(defaultAlbumCover),
                         ),
 
                         // song and artist name and icon
