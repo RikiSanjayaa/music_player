@@ -183,9 +183,13 @@ class _PlaylistPageState extends State<PlaylistPage> {
                           ),
                           const SizedBox(height: 20),
                           Text(
-                            playlist[currentSongIndex].songName,
+                            playlist[currentSongIndex].songName.length > 15
+                                ? '${playlist[currentSongIndex].songName.substring(0, 15)}...'
+                                : playlist[currentSongIndex].songName,
                             style: const TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.bold),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
                           ),
                           Text(playlist[currentSongIndex].artistName),
                         ],
@@ -243,7 +247,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
 
                   // return list tile UI
                   return Dismissible(
-                    key: ValueKey("${song.songName}-${song.artistName}"),
+                    key: ValueKey(song.id),
                     background: Container(
                       color: Colors.red.shade400,
                       alignment: Alignment.centerLeft,
