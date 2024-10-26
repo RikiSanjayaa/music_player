@@ -38,8 +38,10 @@ class PlaylistProvider extends ChangeNotifier {
   // fetching songs from firestore
   Future<void> fetchSongsFromFirestore() async {
     try {
-      QuerySnapshot querySnapshot =
-          await FirebaseFirestore.instance.collection('songs').get();
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('songs')
+          .orderBy('timestamp', descending: false)
+          .get();
       _playlist =
           querySnapshot.docs.map((doc) => Song.fromFirestore(doc)).toList();
       if (_playlist.isNotEmpty) {
@@ -62,7 +64,7 @@ class PlaylistProvider extends ChangeNotifier {
 
   // play the song
   void play() async {
-    final String path = _playlist[_currentSongIndex!].audioPath;
+    final String path = _playlist[_currentSongIndex!].audioUrl;
     await _audioPlayer.stop();
     await _audioPlayer.play(UrlSource(path));
     _isPlaying = true;
@@ -206,6 +208,7 @@ class PlaylistProvider extends ChangeNotifier {
         'artistName': artistName,
         'audioUrl': audioUrl,
         'albumArtImagePath': albumImageUrl,
+        'timestamp': FieldValue.serverTimestamp(),
       });
 
       // Add song to local playlist
@@ -214,7 +217,7 @@ class PlaylistProvider extends ChangeNotifier {
         songName: songName,
         artistName: artistName,
         albumArtImagePath: albumImageUrl,
-        audioPath: audioUrl,
+        audioUrl: audioUrl,
       );
       _playlist.add(newSong);
       notifyListeners();
@@ -249,7 +252,7 @@ class PlaylistProvider extends ChangeNotifier {
       songName: songName,
       artistName: artistName,
       albumArtImagePath: albumArtImagePath,
-      audioPath: _playlist[index].audioPath,
+      audioUrl: _playlist[index].audioUrl,
     );
     notifyListeners();
   }
@@ -268,7 +271,7 @@ class PlaylistProvider extends ChangeNotifier {
       // delete the song from Firestore
       await FirebaseFirestore.instance.collection('songs').doc(songId).delete();
       // delete the media (mp3 and image) from Storage
-      storage.refFromURL(_playlist[index].audioPath).delete();
+      storage.refFromURL(_playlist[index].audioUrl).delete();
       if (_playlist[index].albumArtImagePath.length >= 4) {
         storage.refFromURL(_playlist[index].albumArtImagePath).delete();
       }
