@@ -298,7 +298,6 @@ class _PlaylistPageState extends State<PlaylistPage> {
                     },
                     onDismissed: (direction) {
                       if (direction == DismissDirection.startToEnd) {
-                        // TODO: if isCurrentSong is deleted, change isCurrentSong to next/previous song
                         value.deleteSong(index);
                       }
                     },

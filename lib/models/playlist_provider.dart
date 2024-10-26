@@ -268,6 +268,34 @@ class PlaylistProvider extends ChangeNotifier {
 
     String songId = _playlist[index].id;
     try {
+      // change current song if deleted
+      if (_currentSongIndex != null) {
+        if (_currentSongIndex == index) {
+          _audioPlayer.stop();
+          _isPlaying = false;
+          if (_playlist.isEmpty) {
+            _currentSongIndex = null;
+          } else if (index == _playlist.length) {
+            _currentSongIndex = index - 1;
+          } else {
+            _currentSongIndex = index;
+          }
+          _isPlaying = true;
+          play();
+        } else if (_currentSongIndex! > index) {
+          _currentSongIndex = _currentSongIndex! - 1;
+        }
+      }
+      if (_currentSongIndex == index) {
+        if (index + 1 == _playlist.length) {
+          currentSongIndex = index - 1;
+        } else if (index == 0 && _playlist.length == 1) {
+          currentSongIndex = null;
+        } else if (index + 1 != _playlist.length) {
+          currentSongIndex = index + 1;
+        }
+      }
+
       // delete the song from Firestore
       await FirebaseFirestore.instance.collection('songs').doc(songId).delete();
       // delete the media (mp3 and image) from Storage
@@ -277,6 +305,7 @@ class PlaylistProvider extends ChangeNotifier {
       }
       // remove song from local playlist
       _playlist.removeAt(index);
+
       notifyListeners();
     } catch (e) {
       if (kDebugMode) {
