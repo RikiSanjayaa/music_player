@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:music_player/components/image_utils.dart';
 import 'package:music_player/components/neu_box.dart';
 import 'package:music_player/models/playlist_provider.dart';
 import 'package:music_player/models/song.dart';
@@ -23,7 +26,6 @@ class _PlaylistPageState extends State<PlaylistPage> {
     super.initState();
     // get playlist provider
     playlistProvider = Provider.of<PlaylistProvider>(context, listen: false);
-    // playlistProvider.fetchSongsFromFirestore();
   }
 
   // play song
@@ -74,12 +76,9 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                   labelText: "Artist Name"),
                             ),
                             const SizedBox(height: 20),
-                            albumArtImagePath != ""
+                            albumArtImagePath.isNotEmpty
                                 ? Image.network(albumArtImagePath, height: 300)
-                                : Image.network(
-                                    defaultAlbumCover,
-                                    height: 300,
-                                  ),
+                                : Image.network(defaultAlbumCover, height: 300),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: <Widget>[
@@ -97,16 +96,16 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                 ),
                                 TextButton(
                                   onPressed: () async {
-                                    // TODO: Update album image
-                                    // Implement your image picker logic here
-                                    // For example, using image_picker package
-                                    // final pickedFile = await ImagePicker().getImage(source: ImageSource.gallery);
-                                    // if (pickedFile != null) {
-                                    //   albumArtImagePath = pickedFile.path;
-                                    // }
-                                    Navigator.of(context).pop();
-                                    showEditForm(context, song, index,
-                                        provider); // Reopen the dialog to reflect changes
+                                    File? croppedFile =
+                                        await ImageUtils.pickAlbumImage();
+                                    if (croppedFile != null) {
+                                      String newImagePath =
+                                          await playlistProvider
+                                              .addImage(croppedFile);
+                                      setState(() {
+                                        albumArtImagePath = newImagePath;
+                                      });
+                                    }
                                   },
                                   child: Text(
                                     "Update Image",

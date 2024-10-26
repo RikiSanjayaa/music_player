@@ -173,6 +173,16 @@ class PlaylistProvider extends ChangeNotifier {
     });
   }
 
+  // upload album image
+  Future<String> addImage(File albumImage) async {
+    String albumImageName = albumImage.path.split('/').last;
+    Reference albumImageRef =
+        FirebaseStorage.instance.ref().child('img_file/$albumImageName');
+    UploadTask albumImageUploadTask = albumImageRef.putFile(albumImage);
+    TaskSnapshot albumImageSnapshot = await albumImageUploadTask;
+    return await albumImageSnapshot.ref.getDownloadURL();
+  }
+
   // add song
   Future<void> addSong(String songName, File audioFile,
       [String artistName = "-", File? albumImage]) async {
@@ -191,12 +201,7 @@ class PlaylistProvider extends ChangeNotifier {
       // Upload album image to Firebase Storage (if provided)
       String albumImageUrl = '';
       if (albumImage != null) {
-        String albumImageName = albumImage.path.split('/').last;
-        Reference albumImageRef =
-            FirebaseStorage.instance.ref().child('img_file/$albumImageName');
-        UploadTask albumImageUploadTask = albumImageRef.putFile(albumImage);
-        TaskSnapshot albumImageSnapshot = await albumImageUploadTask;
-        albumImageUrl = await albumImageSnapshot.ref.getDownloadURL();
+        albumImageUrl = await addImage(albumImage);
       } else {
         albumImageUrl = "";
       }

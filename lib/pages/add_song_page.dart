@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:image_cropper/image_cropper.dart';
+import 'package:music_player/components/image_utils.dart';
 import 'package:provider/provider.dart';
 import 'package:music_player/models/playlist_provider.dart';
 
@@ -45,31 +45,12 @@ class _AddSongPageState extends State<AddSongPage> {
     }
   }
 
-  Future<File?> _cropImage(File imageFile) async {
-    CroppedFile? croppedFile = await ImageCropper().cropImage(
-      sourcePath: imageFile.path,
-      aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
-    );
-
-    if (croppedFile != null) {
-      return File(croppedFile.path);
-    }
-    return null;
-  }
-
   Future<void> _pickAlbumImage() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['jpg', 'png'],
-    );
-
-    if (result != null) {
-      File? croppedFile = await _cropImage(File(result.files.single.path!));
+    File? croppedFile = await ImageUtils.pickAlbumImage();
+    if (croppedFile != null) {
       setState(() {
         albumImage = croppedFile;
       });
-    } else {
-      // User canceled the picker
     }
   }
 
