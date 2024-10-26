@@ -49,7 +49,8 @@ class _SongPageState extends State<SongPage> {
                         // image
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
-                          child: currentSong.albumArtImagePath != ""
+                          child: currentSong.albumArtImagePath != "" ||
+                                  currentSong.albumArtImagePath.length > 4
                               ? Image.network(currentSong.albumArtImagePath)
                               : Image.network(defaultAlbumCover),
                         ),

@@ -73,17 +73,21 @@ class _AddSongPageState extends State<AddSongPage> {
     }
   }
 
-  void _saveSong() {
+  Future<void> _saveSong() async {
     if (audioFile != null && _titleController.text.isNotEmpty) {
       final provider = Provider.of<PlaylistProvider>(context, listen: false);
-      // TODO: Make loading view when uploading Audio, CircularProgressIndicator not working properly
-      provider.addSong(
+      // Make loading view when uploading Audio, CircularProgressIndicator not working properly
+      // idea: make the add_song_page widget to stay still while addSong is in progress
+      // indicator in Button/the whole page turn into CircularProgressIndicator
+      await provider.addSong(
         _titleController.text,
         audioFile!,
         _artistController.text.isNotEmpty ? _artistController.text : "-",
         albumImage,
       );
-      Navigator.of(context).pop();
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
     } else {
       // Show an error message if audioFile or title is not provided
       ScaffoldMessenger.of(context).showSnackBar(
@@ -109,94 +113,92 @@ class _AddSongPageState extends State<AddSongPage> {
       ),
       body: Consumer<PlaylistProvider>(
         builder: (context, provider, child) {
-          return provider.isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(12),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                    child: Column(
-                      children: [
-                        const SizedBox(
-                          height: 30,
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(12),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30.0),
+              child: Column(
+                children: [
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green[400]),
+                    icon: Icon(
+                      Icons.audio_file,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                    label: Text("Import Audio File",
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onPrimary)),
+                    onPressed: () {
+                      _pickAudioFile();
+                    },
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  selectedFile != null
+                      ? Text("Selected File: $selectedFile")
+                      : const Text("No audio file selected"),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  TextField(
+                    controller: _titleController,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface),
+                    decoration: const InputDecoration(
+                      labelText: 'Title',
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: _artistController,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface),
+                    decoration: const InputDecoration(
+                      labelText: 'Artist',
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                  Column(
+                    children: [
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey[400]),
+                        icon: Icon(
+                          Icons.image,
+                          color: Theme.of(context).colorScheme.onPrimary,
                         ),
-                        ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green[400]),
-                          icon: Icon(
-                            Icons.audio_file,
-                            color: Theme.of(context).colorScheme.onPrimary,
-                          ),
-                          label: Text("Import Audio File",
-                              style: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.onPrimary)),
-                          onPressed: () {
-                            _pickAudioFile();
-                          },
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        selectedFile != null
-                            ? Text("Selected File: $selectedFile")
-                            : const Text("No audio file selected"),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        TextField(
-                          controller: _titleController,
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface),
-                          decoration: const InputDecoration(
-                            labelText: 'Title',
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        TextField(
-                          controller: _artistController,
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface),
-                          decoration: const InputDecoration(
-                            labelText: 'Artist',
-                          ),
-                        ),
-                        const SizedBox(height: 40),
-                        Column(
-                          children: [
-                            ElevatedButton.icon(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.grey[400]),
-                              icon: Icon(
-                                Icons.image,
-                                color: Theme.of(context).colorScheme.onPrimary,
-                              ),
-                              label: Text("Change album Image",
-                                  style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onPrimary)),
-                              onPressed: () {
-                                _pickAlbumImage();
-                              },
+                        label: Text("Change album Image",
+                            style: TextStyle(
+                                color:
+                                    Theme.of(context).colorScheme.onPrimary)),
+                        onPressed: () {
+                          _pickAlbumImage();
+                        },
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      albumImage == null
+                          ? Image.network(
+                              defaultAlbumImage,
+                              width: 250,
+                            )
+                          : Image.file(
+                              File(albumImage!.path),
+                              width: 250,
                             ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            albumImage == null
-                                ? Image.network(
-                                    defaultAlbumImage,
-                                    width: 250,
-                                  )
-                                : Image.file(
-                                    File(albumImage!.path),
-                                    width: 250,
-                                  ),
-                            const SizedBox(height: 20),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton.icon(
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  provider.isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue[400]),
                           onPressed: () {
@@ -212,10 +214,10 @@ class _AddSongPageState extends State<AddSongPage> {
                                 color: Theme.of(context).colorScheme.onPrimary),
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                );
+                ],
+              ),
+            ),
+          );
         },
       ),
     );

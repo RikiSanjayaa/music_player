@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:music_player/components/my_drawer.dart';
+import 'package:music_player/pages/add_song_page.dart';
 import 'package:music_player/pages/playlist_page.dart';
 import 'package:music_player/pages/song_page.dart';
 
@@ -65,8 +66,11 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            // TODO: implement add new song to playlist
-            onPressed: () {},
+            // add new song to playlist
+            onPressed: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const AddSongPage()));
+            },
           )
         ],
       ),

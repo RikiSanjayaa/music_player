@@ -23,6 +23,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
     super.initState();
     // get playlist provider
     playlistProvider = Provider.of<PlaylistProvider>(context, listen: false);
+    // playlistProvider.fetchSongsFromFirestore();
   }
 
   // play song
@@ -297,7 +298,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                     },
                     onDismissed: (direction) {
                       if (direction == DismissDirection.startToEnd) {
-                        // Handle delete action
+                        // TODO: if isCurrentSong is deleted, change isCurrentSong to next/previous song
                         value.deleteSong(index);
                       }
                     },
